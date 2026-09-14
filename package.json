@@ -1,7 +1,8 @@
 {
-  "name": "pixel-duka-functions",
+  "name": "pixel-duka",
   "version": "1.0.0",
   "private": true,
+  "description": "Pixel Duka storefront + Netlify function dependencies",
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0"
   }
