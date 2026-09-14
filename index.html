@@ -1,1 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Duka — Digital Game Store</title>
+<meta name="description" content="Buy PC and console games in KES. Free titles, daily offers, instant M-Pesa/PesaPal checkout.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="site-header">
+  <div class="container">
+    <a href="#" class="brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="10" rx="4"/><circle cx="8" cy="12" r="1.4" fill="#fff" stroke="none"/><circle cx="16" cy="10.5" r="1" fill="#fff" stroke="none"/><circle cx="18" cy="12.5" r="1" fill="#fff" stroke="none"/>
+        </svg>
+      </span>
+      <span class="brand-name">Pixel<span class="dot">Duka</span></span>
+    </a>
+
+    <nav class="main-nav" aria-label="Primary">
+      <a href="#catalog" class="active">Catalog</a>
+      <a href="#" data-filter="offer">Offers</a>
+      <a href="#" data-filter="free">Free Games</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="header-tools">
+      <label class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="search" id="search-input" placeholder="Search games…" aria-label="Search games">
+      </label>
+
+      <select class="sort-select" id="sort-select" aria-label="Sort games">
+        <option value="newest">Newest</option>
+        <option value="price_asc">Price: Low to High</option>
+        <option value="price_desc">Price: High to Low</option>
+        <option value="name_asc">Name: A–Z</option>
+        <option value="offer_first">Best Offers First</option>
+      </select>
+
+      <button class="icon-btn" id="account-btn" aria-label="Account">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+      </button>
+
+      <button class="icon-btn" id="cart-btn" aria-label="Open cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="21" r="1.4" fill="currentColor" stroke="none"/><path d="M2 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6"/></svg>
+        <span class="badge-count" id="cart-count" hidden>0</span>
+      </button>
+
+      <button class="icon-btn hamburger" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile nav drawer -->
+<div class="mobile-nav" id="mobile-nav">
+  <a href="#catalog">Catalog</a>
+  <a href="#" data-filter="offer">Offers</a>
+  <a href="#" data-filter="free">Free Games</a>
+  <a href="#contact">Contact</a>
+
+  <label class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="search" id="search-input-mobile" placeholder="Search games…" aria-label="Search games">
+  </label>
+  <select class="sort-select" id="sort-select-mobile" aria-label="Sort games">
+    <option value="newest">Newest</option>
+    <option value="price_asc">Price: Low to High</option>
+    <option value="price_desc">Price: High to Low</option>
+    <option value="name_asc">Name: A–Z</option>
+    <option value="offer_first">Best Offers First</option>
+  </select>
+
+  <div class="mobile-social" id="mobile-social"></div>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero">
+  <div class="container">
+    <h1>Every game, one duka.</h1>
+    <p>Browse the catalog, grab today's offers, and check out straight to M-Pesa via PesaPal — no queues, no middlemen.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num" id="stat-total">–</div><div class="label">Games in stock</div></div>
+      <div class="hero-stat"><div class="num" id="stat-offer">–</div><div class="label">On offer today</div></div>
+      <div class="hero-stat"><div class="num" id="stat-free">–</div><div class="label">Free to grab</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CATALOG
+     ============================================================ -->
+<main class="container" id="catalog">
+  <div class="filter-row" id="filter-row">
+    <button class="chip active" data-filter="all">All Games</button>
+    <button class="chip" data-filter="offer">On Offer</button>
+    <button class="chip" data-filter="free">Free</button>
+    <span class="results-count" id="results-count"></span>
+  </div>
+
+  <div class="game-grid" id="game-grid">
+    <!-- game cards injected by js/main.js -->
+  </div>
+</main>
+
+<!-- ============================================================
+     GAME DETAIL MODAL
+     ============================================================ -->
+<div class="overlay" id="game-overlay">
+  <div class="modal" id="game-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-hero">
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+      <img id="modal-image" src="" alt="">
+    </div>
+    <div class="modal-body">
+      <div class="card-category" id="modal-category"></div>
+      <h2 id="modal-title"></h2>
+      <p id="modal-description"></p>
+      <div class="spec-grid" id="modal-specs"></div>
+      <div class="modal-purchase">
+        <div class="price-block">
+          <span class="price-was" id="modal-price-was" hidden></span>
+          <div class="price-now" id="modal-price-now"></div>
+        </div>
+        <div class="qty-stepper">
+          <button type="button" id="qty-minus" aria-label="Decrease quantity">−</button>
+          <span id="qty-value">1</span>
+          <button type="button" id="qty-plus" aria-label="Increase quantity">+</button>
+        </div>
+        <button class="btn btn-amber" id="modal-add-cart">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CART DRAWER
+     ============================================================ -->
+<div class="overlay" id="cart-overlay" style="background:rgba(6,5,10,0.5);"></div>
+<aside class="drawer" id="cart-drawer" aria-label="Shopping cart">
+  <div class="drawer-header">
+    <h3 style="margin:0;font-size:1.1rem;">Your Cart</h3>
+    <button class="modal-close" id="cart-close" aria-label="Close cart" style="position:static;">✕</button>
+  </div>
+  <div class="drawer-body" id="cart-items">
+    <p style="text-align:center;margin-top:40px;">Your cart is empty.</p>
+  </div>
+  <div class="drawer-footer">
+    <div class="subtotal-row"><span>Subtotal</span><span id="cart-subtotal">KES 0</span></div>
+
+    <div class="checkout-fields">
+      <input type="text" id="checkout-name" placeholder="Full name">
+      <input type="tel" id="checkout-phone" placeholder="Phone number e.g. 0712345678">
+      <input type="email" id="checkout-email" placeholder="Email (optional)">
+      <span class="form-hint">Used only to confirm your PesaPal payment.</span>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="checkout-btn">Proceed to Checkout</button>
+  </div>
+</aside>
+
+<!-- ============================================================
+     ACCOUNT MODAL
+     ============================================================ -->
+<div class="overlay" id="account-overlay">
+  <div class="modal" style="max-width:400px;">
+    <button class="modal-close" id="account-close" aria-label="Close">✕</button>
+    <div class="modal-body" style="padding-top:26px;">
+      <h2 style="margin-bottom:16px;">Your Account</h2>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="login">Sign In</button>
+        <button class="tab-btn" data-tab="signup">Create Account</button>
+      </div>
+
+      <form class="auth-form" id="login-form">
+        <input type="email" placeholder="Email" id="login-email" required>
+        <input type="password" placeholder="Password" id="login-password" required>
+        <button class="btn btn-primary btn-block" type="submit">Sign In</button>
+        <div class="auth-status" id="login-status"></div>
+      </form>
+
+      <form class="auth-form" id="signup-form" hidden>
+        <input type="text" placeholder="Full name" id="signup-name" required>
+        <input type="email" placeholder="Email" id="signup-email" required>
+        <input type="password" placeholder="Password (min 6 characters)" id="signup-password" required minlength="6">
+        <button class="btn btn-amber btn-block" type="submit">Create Account</button>
+        <div class="auth-status" id="signup-status"></div>
+      </form>
+
+      <div id="account-signed-in" hidden style="text-align:center;">
+        <p>Signed in as <strong id="account-email"></strong></p>
+        <button class="btn btn-ghost btn-block" id="signout-btn">Sign Out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Talk to Pixel Duka</h4>
+        <p>Questions about an order, a game, or a refund? Reach us directly — usually a reply within minutes.</p>
+        <div class="contact-buttons">
+          <a class="contact-btn whatsapp" href="https://wa.me/254700000000" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2a8.1 8.1 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4.1-.2 0-.3 0-.5-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.1 0 1.2.9 2.4 1 2.6.1.2 1.8 2.7 4.3 3.8.6.3 1.1.4 1.4.5.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+            WhatsApp
+          </a>
+          <a class="contact-btn telegram" href="https://t.me/pixelduka" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.1c-.3-.2-.7-.3-1.2-.1L2.7 10.7c-.6.2-.6.5-.6.7 0 .2 0 .5.6.7l4.7 1.5 1.8 5.7c.1.4.4.6.7.6.2 0 .4-.1.6-.3l2.6-2.5 4.6 3.4c.2.2.5.3.7.3.2 0 .3 0 .5-.1.3-.2.5-.5.6-.9L22.4 5.3c.1-.5 0-.9-.5-1.2zM9.4 13.4l-2.9-1 10.6-6.5-7.7 7.5zm.9 4.4l-1-3.2 1-1 2.4 1.8-2.4 2.4zm4.4-1.4l-3.6-2.7 6.7-6.5-3.1 9.2z"/></svg>
+            Telegram
+          </a>
+        </div>
+
+        <h4 style="margin-top:24px;">Follow Us</h4>
+        <div class="social-row" id="social-row"></div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <div class="footer-links">
+          <a href="#catalog">Full Catalog</a>
+          <a href="#" data-filter="offer">Today's Offers</a>
+          <a href="#" data-filter="free">Free Games</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Support</h4>
+        <div class="footer-links">
+          <a href="https://wa.me/254700000000" target="_blank" rel="noopener">Order Help</a>
+          <a href="mailto:hello@pixelduka.co.ke">hello@pixelduka.co.ke</a>
+          <a href="admin.html">Admin Panel</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Pixel Duka. All prices in KES.</span>
+      <span>Payments secured by PesaPal</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
