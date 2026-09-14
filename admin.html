@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Duka — Admin</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .admin-shell{ max-width: 1040px; margin: 0 auto; padding: 30px 20px 80px; }
+  .admin-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 26px; flex-wrap:wrap; gap:12px; }
+  .admin-card{ background: var(--surface); border:1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 22px; }
+  .admin-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .admin-grid label{ display:flex; flex-direction:column; gap:6px; font-size:.82rem; font-weight:700; color: var(--text-muted); }
+  .admin-grid input, .admin-grid select, .admin-grid textarea{
+    background: var(--surface-2); border:1px solid var(--border); color:var(--text);
+    border-radius: var(--radius-sm); padding: 10px 12px; font-size:.9rem; font-family: var(--font-body);
+  }
+  .admin-grid input:focus, .admin-grid select:focus, .admin-grid textarea:focus{ outline:none; border-color: var(--violet); }
+  .full-row{ grid-column: 1 / -1; }
+  .checkbox-row{ flex-direction:row !important; align-items:center; gap:8px !important; }
+  .checkbox-row input{ width:auto; }
+  .spec-row-builder{ display:flex; flex-direction:column; gap:8px; }
+  .spec-pair{ display:grid; grid-template-columns: 1fr 1fr auto; gap:8px; }
+  .spec-pair button{ background: var(--surface-2); border:1px solid var(--border); color: var(--danger); border-radius: var(--radius-sm); cursor:pointer; }
+  table{ width:100%; border-collapse: collapse; font-size:.88rem; }
+  th, td{ text-align:left; padding: 10px 8px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  th{ color: var(--text-faint); font-size:.75rem; text-transform:none; }
+  td img{ width:44px; height:44px; object-fit:cover; border-radius:6px; }
+  .row-actions{ display:flex; gap:8px; }
+  .row-actions button{ background:none; border:0; cursor:pointer; font-weight:700; font-size:.82rem; }
+  .row-actions .edit{ color: var(--violet); }
+  .row-actions .delete{ color: var(--danger); }
+  .discount-field{ display:none; }
+  .discount-field.show{ display:flex; }
+  #login-gate{ max-width: 380px; margin: 80px auto; }
+</style>
+</head>
+<body>
+
+<div class="admin-shell">
+  <div class="admin-header">
+    <a href="index.html" class="brand" style="text-decoration:none;">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="4"/></svg>
+      </span>
+      <span class="brand-name">Pixel<span class="dot">Duka</span> <span style="color:var(--text-faint);font-size:.8rem;">/ Admin</span></span>
+    </a>
+    <div id="admin-user-box" hidden style="display:flex; align-items:center; gap:12px;">
+      <span style="color:var(--text-muted); font-size:.86rem;" id="admin-email"></span>
+      <button class="btn btn-ghost" id="admin-signout">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- LOGIN GATE -->
+  <div class="admin-card" id="login-gate">
+    <h2 style="margin-bottom:16px;">Admin Sign In</h2>
+    <form class="auth-form" id="admin-login-form">
+      <input type="email" placeholder="Email" id="admin-email-input" required>
+      <input type="password" placeholder="Password" id="admin-password-input" required>
+      <button class="btn btn-primary btn-block" type="submit">Sign In</button>
+      <div class="auth-status" id="admin-login-status"></div>
+    </form>
+  </div>
+
+  <!-- DASHBOARD (hidden until authenticated + confirmed admin) -->
+  <div id="admin-dashboard" hidden>
+
+    <div class="admin-card">
+      <h2 id="form-title" style="margin-bottom:16px;">Add a Game</h2>
+      <form id="game-form">
+        <input type="hidden" id="game-id">
+        <div class="admin-grid">
+          <label>Name
+            <input type="text" id="f-name" required>
+          </label>
+          <label>Category
+            <input type="text" id="f-category" placeholder="Action, Racing, Strategy…" required>
+          </label>
+
+          <label class="full-row">Description
+            <textarea id="f-description" rows="3" required></textarea>
+          </label>
+
+          <label class="full-row">Cover image URL
+            <input type="url" id="f-image" placeholder="https://…" required>
+          </label>
+
+          <label>Price (KES)
+            <input type="number" id="f-price" min="0" step="1" value="0" required>
+          </label>
+          <label>Stock status
+            <select id="f-stock">
+              <option value="available">Available</option>
+              <option value="out_of_stock">Out of stock</option>
+              <option value="coming_soon">Coming soon</option>
+            </select>
+          </label>
+
+          <label class="checkbox-row">
+            <input type="checkbox" id="f-free"> This game is free
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" id="f-offer"> On offer
+          </label>
+
+          <label class="discount-field full-row" id="discount-wrap">Discount percentage
+            <input type="number" id="f-discount" min="0" max="100" step="1" value="0">
+          </label>
+
+          <div class="full-row">
+            <label style="margin-bottom:6px;">Specs (key / value — e.g. Platform / PC)</label>
+            <div class="spec-row-builder" id="spec-builder"></div>
+            <button type="button" class="btn btn-ghost" id="add-spec-row" style="margin-top:10px;">+ Add Spec</button>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:20px;">
+          <button type="submit" class="btn btn-amber" id="save-game-btn">Save Game</button>
+          <button type="button" class="btn btn-ghost" id="cancel-edit-btn" hidden>Cancel Edit</button>
+        </div>
+        <div class="auth-status" id="game-form-status"></div>
+      </form>
+    </div>
+
+    <div class="admin-card">
+      <h2 style="margin-bottom:16px;">Catalog</h2>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th></th><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody id="admin-game-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-card" id="not-admin-notice" hidden>
+    <h2>Not authorized</h2>
+    <p>This account can sign in but isn't listed in the <code>admins</code> table yet. Add your user's UUID there via the Supabase SQL editor to unlock the dashboard.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
