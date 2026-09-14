@@ -341,6 +341,20 @@ document.getElementById("checkout-btn").addEventListener("click", async () => {
       btn.textContent = "Proceed to Checkout";
       return;
     }
+    if (result.free_order) {
+      showToast(result.message || "Order confirmed — no payment needed");
+      CART = []; saveCart(); renderCart();
+      btn.disabled = false;
+      btn.textContent = "Proceed to Checkout";
+      return;
+    }
+    if (!result.checkout_url) {
+      showToast("Payment started but no checkout link was returned. Please contact support.");
+      console.error("Missing checkout_url in response:", result);
+      btn.disabled = false;
+      btn.textContent = "Proceed to Checkout";
+      return;
+    }
     window.location.href = result.checkout_url;
   } catch (err) {
     console.error(err);

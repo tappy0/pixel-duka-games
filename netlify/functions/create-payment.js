@@ -131,15 +131,25 @@ exports.handler = async (event) => {
       return { statusCode: response.status || 500, headers, body: JSON.stringify({ error: result.error || "Payment request failed" }) };
     }
 
+    // The Central Payment API's field names can vary by version —
+    // fall back to alternates rather than silently returning undefined.
+    const checkoutUrl = result.checkout_url || result.redirect_url;
+    const trackingId = result.order_tracking_id || result.tracking_id;
+
+    if (!checkoutUrl) {
+      console.error("Central API returned success with no checkout_url/redirect_url:", result);
+      return { statusCode: 502, headers, body: JSON.stringify({ error: "Payment provider did not return a checkout link" }) };
+    }
+
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
         payment_id: result.payment_id,
-        order_tracking_id: result.order_tracking_id,
+        order_tracking_id: trackingId,
         merchant_reference: result.merchant_reference,
-        checkout_url: result.checkout_url,
+        checkout_url: checkoutUrl,
       }),
     };
   } catch (error) {
