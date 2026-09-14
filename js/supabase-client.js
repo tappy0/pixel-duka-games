@@ -4,8 +4,8 @@
    Find them in: Supabase Dashboard → Project Settings → API
    ============================================================== */
 
-const SUPABASE_URL = "https://vfraxdbhsswzdxdjiupc.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_eSD9VC4LBSRLd2TtWc7Ydw_KoNKy-Xz;
+const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-PUBLIC-ANON-KEY";
 
 // This client is safe to expose in frontend code — the anon key
 // only grants what your Row Level Security policies allow
