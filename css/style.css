@@ -92,7 +92,7 @@ img{ max-width: 100%; display:block; }
 
 .main-nav{ display:flex; align-items:center; gap: 22px; }
 .main-nav a{
-  text-decoration:none; color: var(--text-muted); font-weight:600; font-size:.94rem;
+  text-decoration:none; color: var(--text-muted); font-weight:100; font-size:.94rem;
   padding: 6px 2px; border-bottom: 2px solid transparent;
   transition: color .15s ease, border-color .15s ease;
 }
