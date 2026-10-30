@@ -82,10 +82,11 @@
             <textarea id="f-description" rows="3" required></textarea>
           </label>
 
-          <label class="full-row">Cover image URL
-            <input type="url" id="f-image" placeholder="https://…" required>
-          </label>
-
+          <label class="full-row">Cover image
+  <input type="file" id="f-image-file" accept="image/*">
+  <input type="url" id="f-image" placeholder="…or paste a direct image link (https://…)">
+  <img id="f-image-preview" alt="" style="max-height:120px;margin-top:8px;border-radius:8px;" hidden>
+</label>
           <label>Price (KES)
             <input type="number" id="f-price" min="0" step="1" value="0" required>
           </label>
