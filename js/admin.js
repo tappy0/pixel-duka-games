@@ -143,6 +143,33 @@ function startEdit(game) {
 }
 
 /* ----------------------------------------------------------
+   COVER IMAGE: upload a file OR paste a direct link
+   ---------------------------------------------------------- */
+const imgFile = document.getElementById("f-image-file");
+const imgUrl = document.getElementById("f-image");
+const imgPreview = document.getElementById("f-image-preview");
+
+function showPreview(src) {
+  imgPreview.hidden = !src;
+  imgPreview.onerror = () => showToast("That link isn't a direct image — try uploading instead");
+  imgPreview.src = src || "";
+}
+imgUrl.addEventListener("change", () => showPreview(imgUrl.value.trim()));
+imgFile.addEventListener("change", () => {
+  if (imgFile.files[0]) showPreview(URL.createObjectURL(imgFile.files[0]));
+});
+
+async function resolveImageUrl() {
+  const file = imgFile.files[0];
+  if (!file) return imgUrl.value.trim();
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabaseClient.storage.from("covers").upload(path, file);
+  if (error) throw error;
+  return supabaseClient.storage.from("covers").getPublicUrl(path).data.publicUrl;
+}
+
+/* ----------------------------------------------------------
    SAVE (insert or update)
    ---------------------------------------------------------- */
 document.getElementById("game-form").addEventListener("submit", async e => {
@@ -150,33 +177,84 @@ document.getElementById("game-form").addEventListener("submit", async e => {
   const statusEl = document.getElementById("game-form-status");
   statusEl.textContent = "Saving…"; statusEl.className = "auth-status";
 
+  // 1. Get the cover image URL (uploaded file or pasted link)
+  let imageUrl;
+  try {
+    imageUrl = await resolveImageUrl();
+  } catch (err) {
+    statusEl.textContent = "Image upload failed: " + err.message;
+    statusEl.className = "auth-status error";
+    return;
+  }
+  if (!imageUrl) {
+    statusEl.textContent = "Add a cover image (upload a file or paste a direct link).";
+    statusEl.className = "auth-status error";
+    return;
+  }
+
+  // 2. Build the data to save
   const payload = {
     name: document.getElementById("f-name").value.trim(),
     category: document.getElementById("f-category").value.trim(),
     description: document.getElementById("f-description").value.trim(),
-    image_url: document.getElementById("f-image").value.trim(),
+    image_url: imageUrl,
     price: Number(document.getElementById("f-price").value) || 0,
     stock_status: document.getElementById("f-stock").value,
     is_free: document.getElementById("f-free").checked,
     is_on_offer: document.getElementById("f-offer").checked,
-    discount_percentage: document.getElementById("f-offer").checked ? Number(document.getElementById("f-discount").value) || 0 : 0,
+    discount_percentage: document.getElementById("f-offer").checked
+      ? Number(document.getElementById("f-discount").value) || 0
+      : 0,
     specs: collectSpecs(),
   };
 
+  // 3. Insert or update the game
+  const wasEditing = !!EDITING_ID;
+  let gameId = EDITING_ID;
   let error;
-  if (EDITING_ID) {
+
+  if (wasEditing) {
     ({ error } = await supabaseClient.from("games").update(payload).eq("id", EDITING_ID));
   } else {
-    ({ error } = await supabaseClient.from("games").insert(payload));
+    const res = await supabaseClient.from("games").insert(payload).select("id").single();
+    error = res.error;
+    if (res.data) gameId = res.data.id;
   }
 
   if (error) {
-    statusEl.textContent = error.message; statusEl.className = "auth-status error";
+    statusEl.textContent = error.message;
+    statusEl.className = "auth-status error";
     return;
   }
-  statusEl.textContent = EDITING_ID ? "Game updated." : "Game added.";
+
+  // 4. Save the private download link (only if that field exists in admin.html)
+  const dlInput = document.getElementById("f-download");
+  if (dlInput) {
+    const dl = dlInput.value.trim();
+    if (dl) {
+      const isUrl = /^https?:\/\//i.test(dl);
+      const { error: fErr } = await supabaseClient.from("game_files").upsert({
+        game_id: gameId,
+        download_url: isUrl ? dl : null,
+        file_path: isUrl ? null : dl,
+      });
+      if (fErr) {
+        statusEl.textContent = "Game saved, but download link failed: " + fErr.message;
+        statusEl.className = "auth-status error";
+        loadGames();
+        return;
+      }
+    } else if (wasEditing) {
+      await supabaseClient.from("game_files").delete().eq("game_id", gameId);
+    }
+  }
+
+  // 5. Done: reset the form and the image fields
+  statusEl.textContent = wasEditing ? "Game updated." : "Game added.";
   statusEl.className = "auth-status success";
   resetForm();
+  imgFile.value = "";
+  showPreview("");
   loadGames();
 });
 
