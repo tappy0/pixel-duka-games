@@ -392,6 +392,17 @@ img{ max-width: 100%; display:block; }
   color: var(--text-faint); font-size:.8rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
 }
 
+
+.desc-list{
+  margin: 0 0 1em;
+  padding-left: 20px;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.desc-list li::marker{ color: var(--amber); }
+
 /* ==============================================================
    RESPONSIVE
    ============================================================== */

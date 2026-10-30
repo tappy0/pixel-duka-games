@@ -202,7 +202,21 @@ function openGameModal(id) {
   document.getElementById("modal-image").alt = g.name;
   document.getElementById("modal-category").textContent = g.category || "Game";
   document.getElementById("modal-title").textContent = g.name;
-  document.getElementById("modal-description").textContent = g.description || "";
+  const descEl = document.getElementById("modal-description");
+descEl.innerHTML = "";
+
+const raw = g.description || "";
+// One bullet per line; if it's a single paragraph, split by sentence instead
+let items = raw.split(/\r?\n/).map(s => s.replace(/^[\s\-•*]+/, "").trim()).filter(Boolean);
+if (items.length <= 1) {
+  items = raw.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
+}
+
+items.forEach(text => {
+  const li = document.createElement("li");
+  li.textContent = text;   // textContent keeps it safe from HTML injection
+  descEl.appendChild(li);
+});
 
   const specs = g.specs && typeof g.specs === "object" ? g.specs : {};
   const specEntries = Object.entries(specs);
